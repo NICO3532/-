@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ReadFlow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "Helvetica Neue", Roboto, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            overflow: hidden;
+        }
+
+        .app {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            max-width: 520px;
+            margin: 0 auto;
+            background: #f5f5f7;
+        }
+
+        /* Header - 极简 */
+        .header {
+            padding: 12px 20px 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f5f5f7;
+            flex-shrink: 0;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #1d1d1f;
+        }
+
+        .header-date {
+            font-size: 12px;
+            color: #6e6e73;
+            font-weight: 500;
+        }
+
+        .streak-badge {
+            font-size: 12px;
+            color: #007aff;
+            font-weight: 700;
+            background: rgba(0,122,255,0.1);
+            padding: 4px 10px;
+            border-radius: 100px;
+            white-space: nowrap;
+        }
+
+        /* Main */
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0 16px 16px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .main::-webkit-scrollbar { display: none; }
+
+        /* 迷你热力图 - 一行 */
+        .mini-streak {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 12px;
+            padding: 0 4px;
+        }
+
+        .mini-streak-label {
+            font-size: 11px;
+            color: #8e8e93;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .mini-heat {
+            display: flex;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .mini-cell {
+            flex: 1;
+            height: 8px;
+            border-radius: 2px;
+            background: #e8e8ed;
+            cursor: pointer;
+            border: none;
+            -webkit-appearance: none;
+            transition: transform 0.15s;
+        }
+
+        .mini-cell:active { transform: scale(1.3); }
+        .mini-cell.l1 { background: #c7e0ff; }
+        .mini-cell.l2 { background: #7ab8ff; }
+        .mini-cell.l3 { background: #3d94ff; }
+        .mini-cell.l4 { background: #007aff; }
+
+        /* 每日回顾 - 紧凑 */
+        .review-box {
+            background: linear-gradient(135deg, #e8f0ff, #f0f7ff);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .review-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #007aff;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .review-ago { font-size: 11px; color: #aeaeb2; font-weight: 500; }
+        .review-book { font-size: 14px; font-weight: 700; margin-bottom: 4px; color: #1d1d1f; line-height: 1.4; }
+        .review-insight { font-size: 13px; color: #6e6e73; line-height: 1.5; margin-bottom: 8px; }
+
+        .review-actions { display: flex; gap: 6px; }
+
+        .review-btn {
+            padding: 6px 12px;
+            border-radius: 100px;
+            border: 1px solid rgba(0,0,0,0.08);
+            background: #fff;
+            color: #1d1d1f;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        /* 输入区 - 核心视觉 */
+        .input-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(0,0,0,0.06);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+        }
+
+        .input-group { margin-bottom: 14px; }
+        .input-group:last-child { margin-bottom: 0; }
+
+        .input-label {
+            font-size: 11px;
+            color: #6e6e73;
+            font-weight: 700;
+            margin-bottom: 6px;
+            display: block;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .input-field {
+            width: 100%;
+            background: #f5f5f7;
+            border: 1.5px solid rgba(0,0,0,0.06);
+            border-radius: 14px;
+            padding: 14px 18px;
+            color: #1d1d1f;
+            font-size: 16px;
+            outline: none;
+            -webkit-appearance: none;
+            transition: all 0.2s;
+        }
+
+        .input-field:focus {
+            border-color: #007aff;
+            box-shadow: 0 0 0 4px rgba(0,122,255,0.12);
+            background: #fff;
+        }
+
+        .input-field::placeholder { color: #c7c7cc; }
+
+        textarea.input-field {
+            min-height: 90px;
+            resize: none;
+            line-height: 1.6;
+        }
+
+        /* 链接建议 */
+        .link-suggest {
+            position: absolute;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 50;
+            display: none;
+            width: 100%;
+            left: 0;
+            top: 100%;
+            margin-top: 4px;
+        }
+
+        .link-suggest-item {
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            color: #1d1d1f;
+            background: #fff;
+            border: none;
+            width: 100%;
+            text-align: left;
+            -webkit-appearance: none;
+        }
+
+        .link-suggest-item:last-child { border-bottom: none; }
+        .link-suggest-item:hover { background: rgba(0,122,255,0.08); color: #007aff; }
+
+        .wiki-link { color: #007aff; text-decoration: underline; font-weight: 600; cursor: pointer; }
+
+        /* 标签 */
+        .tag-box { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+
+        .tag {
+            padding: 7px 16px;
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: #f5f5f7;
+            color: #6e6e73;
+            -webkit-appearance: none;
+            transition: all 0.15s;
+        }
+
+        .tag.on { background: #007aff; color: #fff; border-color: #007aff; }
+        .tag:active { transform: scale(0.92); }
+
+        /* 记录按钮 - Tesla 风格 */
+        .btn-primary {
+            width: 100%;
+            padding: 18px;
+            border-radius: 14px;
+            background: #007aff;
+            color: #fff;
+            border: none;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+            -webkit-appearance: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(0,122,255,0.25);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+            background: #0056b3;
+            box-shadow: 0 2px 8px rgba(0,122,255,0.2);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            background: #e8e8ed;
+            color: #1d1d1f;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            -webkit-appearance: none;
+        }
+
+        .btn-secondary:active { background: #d1d1d6; }
+
+        /* 今日记录 */
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            letter-spacing: -0.3px;
+        }
+
+        .section-count {
+            font-size: 12px;
+            color: #6e6e73;
+            font-weight: 600;
+            background: #fff;
+            padding: 4px 12px;
+            border-radius: 100px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .card-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(0,0,0,0.06);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:active { transform: scale(0.99); }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #007aff;
+            border-radius: 0 4px 4px 0;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .card:hover::before { opacity: 1; }
+
+        .card-book { font-size: 15px; font-weight: 700; margin-bottom: 6px; line-height: 1.4; padding-right: 70px; color: #1d1d1f; }
+        .card-insight { font-size: 14px; color: #6e6e73; line-height: 1.5; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-meta { display: flex; align-items: center; justify-content: space-between; }
+
+        .card-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(0,122,255,0.1);
+            color: #007aff;
+        }
+
+        .card-time { font-size: 12px; color: #aeaeb2; font-weight: 500; }
+
+        .card-actions {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        .card-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            -webkit-appearance: none;
+        }
+
+        .card-btn-edit { background: rgba(0,122,255,0.1); color: #007aff; }
+        .card-btn-delete { background: rgba(255,59,48,0.1); color: #ff3b30; }
+        .card-btn:active { transform: scale(0.85); }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6e6e73;
+        }
+
+        .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
+        .empty-text { font-size: 15px; font-weight: 600; }
+
+        /* 搜索页 */
+        .search-box-wrap { position: relative; margin-bottom: 12px; }
+
+        .search-box {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border-radius: 16px;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: #fff;
+            color: #1d1d1f;
+            font-size: 16px;
+            font-weight: 500;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .search-box:focus { border-color: #007aff; box-shadow: 0 0 0 3px rgba(0,122,255,0.15); }
+        .search-box::placeholder { color: #aeaeb2; }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #aeaeb2;
+            pointer-events: none;
+        }
+
+        .search-count { font-size: 13px; color: #6e6e73; font-weight: 600; margin-bottom: 10px; }
+
+        .highlight {
+            background: rgba(0,122,255,0.15);
+            color: #007aff;
+            padding: 0 2px;
+            border-radius: 3px;
+            font-weight: 700;
+        }
+
+        /* 统计页 */
+        .stats-tabs {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 16px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 5px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .stats-tab {
+            flex: 1;
+            padding: 10px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: #6e6e73;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            -webkit-appearance: none;
+        }
+
+        .stats-tab.on { background: #007aff; color: #fff; }
+
+        .chart-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .chart-title { font-size: 16px; font-weight: 700; color: #1d1d1f; }
+        .chart-subtitle { font-size: 12px; color: #aeaeb2; font-weight: 500; }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            height: 150px;
+            gap: 4px;
+            padding: 0 2px;
+        }
+
+        .bar-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .bar {
+            width: 100%;
+            max-width: 24px;
+            background: linear-gradient(180deg, #007aff, #5aa3ff);
+            border-radius: 4px 4px 0 0;
+            min-height: 4px;
+            cursor: pointer;
+        }
+
+        .bar-label { font-size: 10px; color: #aeaeb2; font-weight: 600; white-space: nowrap; }
+        .bar-value { font-size: 11px; color: #007aff; font-weight: 700; opacity: 0; transition: opacity 0.2s; }
+        .bar-item:hover .bar-value { opacity: 1; }
+
+        .date-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .date-row input[type="date"] {
+            flex: 1;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: #f5f5f7;
+            color: #1d1d1f;
+            font-size: 15px;
+            font-weight: 600;
+            outline: none;
+            -webkit-appearance: none;
+            font-family: inherit;
+        }
+
+        .date-row input[type="date"]:focus { border-color: #007aff; box-shadow: 0 0 0 3px rgba(0,122,255,0.15); }
+
+        .date-btn {
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(0,0,0,0.08);
+            background: #f5f5f7;
+            color: #1d1d1f;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+            -webkit-appearance: none;
+        }
+
+        .tag-ranking { display: flex; flex-direction: column; gap: 12px; }
+
+        .rank-item { display: flex; align-items: center; gap: 10px; }
+
+        .rank-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #f5f5f7;
+            border-radius: 100px;
+            overflow: hidden;
+        }
+
+        .rank-bar-fill {
+            height: 100%;
+            border-radius: 100px;
+            transition: width 0.6s;
+        }
+
+        .rank-label { font-size: 13px; font-weight: 600; min-width: 50px; color: #1d1d1f; }
+        .rank-value { font-size: 13px; color: #6e6e73; min-width: 28px; text-align: right; font-weight: 700; }
+
+        /* 设置页 */
+        .setting-group {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+
+        .setting-item {
+            padding: 16px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            cursor: pointer;
+            background: #fff;
+            border: none;
+            width: 100%;
+            text-align: left;
+            -webkit-appearance: none;
+        }
+
+        .setting-item:last-child { border-bottom: none; }
+        .setting-item:active { background: #f5f5f7; }
+
+        .setting-label { font-size: 15px; font-weight: 600; color: #1d1d1f; }
+        .setting-desc { font-size: 12px; color: #aeaeb2; margin-top: 2px; font-weight: 500; }
+
+        .btn-danger {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: rgba(255,59,48,0.08);
+            color: #ff3b30;
+            border: 1.5px solid rgba(255,59,48,0.15);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+
+        .btn-danger:active { background: rgba(255,59,48,0.15); }
+
+        /* 底部导航 */
+        .bottom-nav {
+            position: sticky;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0,0,0,0.06);
+            padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 12px;
+            color: #6e6e73;
+            border: none;
+            background: none;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            flex: 1;
+            -webkit-appearance: none;
+        }
+
+        .nav-item.on { color: #007aff; }
+        .nav-item:active { transform: scale(0.9); }
+
+        .nav-icon { font-size: 20px; line-height: 1; }
+
+        .page { display: none; }
+        .page.on { display: block; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .modal-overlay.on { display: flex; }
+
+        .modal-sheet {
+            width: 100%;
+            max-width: 520px;
+            background: #fff;
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px 28px;
+            border: 1px solid rgba(0,0,0,0.06);
+            border-bottom: none;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title { font-size: 18px; font-weight: 800; color: #1d1d1f; }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #e8e8ed;
+            border: 1px solid rgba(0,0,0,0.08);
+            color: #6e6e73;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            -webkit-appearance: none;
+        }
+
+        .modal-close:active { background: #d1d1d6; }
+
+        .toast {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #1d1d1f;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 300;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ReadFlow">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQ0IiBmaWxsPSIjMDA3YWZmIi8+PHBhdGggZD0iTTUyIDYwYzAtNCAzLTggOC04aDI0YzUgMCA4IDQgOCA4djcyYzAgNC0zIDgtOCA4SDYwYy01IDAtOC00LTgtOFY2MHptNDggMGMwLTQgMy04IDgtOGgyNGM1IDAgOCA0IDggOHY3MmMwIDQtMyA4LTggOGgtMjRjLTUgMC04LTQtOC04VjYweiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNjQiIHk9IjU2IiB3aWR0aD0iMTYiIGhlaWdodD0iODAiIHJ4PSIyIiBmaWxsPSIjZmZmIi8+PHJlY3QgeD0iMTEyIiB5PSI1NiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjgwIiByeD0iMiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIlJlYWRGbG93IiwgInNob3J0X25hbWUiOiAiUmVhZEZsb3ciLCAic3RhcnRfdXJsIjogIi4iLCAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwgImJhY2tncm91bmRfY29sb3IiOiAiI2Y1ZjVmNyIsICJ0aGVtZV9jb2xvciI6ICIjMDA3YWZmIiwgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0In0=">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjQ0IiBmaWxsPSIjMDA3YWZmIi8+PHBhdGggZD0iTTUyIDYwYzAtNCAzLTggOC04aDI0YzUgMCA4IDQgOCA4djcyYzAgNC0zIDgtOCA4SDYwYy01IDAtOC00LTgtOFY2MHptNDggMGMwLTQgMy04IDgtOGgyNGM1IDAgOCA0IDggOHY3MmMwIDQtMyA4LTggOGgtMjRjLTUgMC04LTQtOC04VjYweiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC45Ii8+PHJlY3QgeD0iNjQiIHk9IjU2IiB3aWR0aD0iMTYiIGhlaWdodD0iODAiIHJ4PSIyIiBmaWxsPSIjZmZmIi8+PHJlY3QgeD0iMTEyIiB5PSI1NiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjgwIiByeD0iMiIgZmlsbD0iI2ZmZiIvPjwvc3ZnPg==">
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <div>
+                <div class="header-title" id="pageTitle">ReadFlow</div>
+                <div class="header-date" id="currentDate"></div>
+            </div>
+            <div class="streak-badge" id="streakBadge">0 天</div>
+        </header>
+
+        <main class="main" id="mainContent">
+            <!-- 今日页面 -->
+            <div class="page on" id="page-today">
+                <!-- 迷你热力图 -->
+                <div class="mini-streak" id="miniStreak"></div>
+
+                <!-- 每日回顾 -->
+                <div class="review-box" id="reviewBox" style="display:none">
+                    <div class="review-header">
+                        <span class="review-label">每日回顾</span>
+                        <span class="review-ago" id="reviewAgo"></span>
+                    </div>
+                    <div class="review-book" id="reviewBook"></div>
+                    <div class="review-insight" id="reviewInsight"></div>
+                    <div class="review-actions">
+                        <button class="review-btn" id="btnEditReview" type="button">编辑</button>
+                        <button class="review-btn" id="btnNextReview" type="button">换一条</button>
+                    </div>
+                </div>
+                <div class="empty-state" id="reviewEmpty" style="display:none; padding:20px">
+                    <div class="empty-text">记录满 2 天后开启每日回顾</div>
+                </div>
+
+                <!-- 输入区 - 核心 -->
+                <div class="input-box">
+                    <div class="input-group">
+                        <label class="input-label">书名 / 内容</label>
+                        <input type="text" class="input-field" id="inputBook" placeholder="今天读了什么？">
+                    </div>
+                    <div class="input-group" style="position:relative">
+                        <label class="input-label">一句话产出（输入 [[ 引用过往记录）</label>
+                        <textarea class="input-field" id="inputInsight" placeholder="你的感悟、收获、行动点..."></textarea>
+                        <div class="link-suggest" id="linkSuggest"></div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">标签</label>
+                        <div class="tag-box" id="tagBox">
+                            <button class="tag" data-tag="心理学" type="button">心理学</button>
+                            <button class="tag" data-tag="成长" type="button">成长</button>
+                            <button class="tag" data-tag="习惯" type="button">习惯</button>
+                            <button class="tag" data-tag="财商" type="button">财商</button>
+                            <button class="tag" data-tag="写作" type="button">写作</button>
+                            <button class="tag" data-tag="其他" type="button">其他</button>
+                        </div>
+                    </div>
+                    <button class="btn-primary" id="btnAddRecord" type="button">记录产出</button>
+                </div>
+
+                <!-- 今日记录 -->
+                <div class="section-title">
+                    <span>今日记录</span>
+                    <span class="section-count" id="todayCount">0 条</span>
+                </div>
+                <div class="card-list" id="cardList"></div>
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-icon">&#128214;</div>
+                    <div class="empty-text">今天还没有记录，开始阅读吧</div>
+                </div>
+            </div>
+
+            <!-- 统计页面 -->
+            <div class="page" id="page-stats">
+                <div class="stats-tabs">
+                    <button class="stats-tab on" data-tab="day" type="button">日</button>
+                    <button class="stats-tab" data-tab="week" type="button">周</button>
+                    <button class="stats-tab" data-tab="month" type="button">月</button>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <span class="chart-title" id="trendTitle">近7天产出趋势</span>
+                        <span class="chart-subtitle" id="trendSubtitle">点击柱状图查看详情</span>
+                    </div>
+                    <div class="bar-chart" id="trendChart"></div>
+                </div>
+
+                <div class="chart-box">
+                    <div class="chart-header">
+                        <span class="chart-title" id="tagTitle">标签分布</span>
+                        <span class="chart-subtitle" id="tagSubtitle">今日</span>
+                    </div>
+                    <div class="date-row" id="dateRow" style="display:none">
+                        <input type="date" id="statsDatePicker">
+                        <button class="date-btn" id="btnResetDate" type="button">回到今天</button>
+                    </div>
+                    <div class="tag-ranking" id="tagRanking"></div>
+                </div>
+            </div>
+
+            <!-- 搜索页面 -->
+            <div class="page" id="page-search">
+                <div class="search-box-wrap">
+                    <span class="search-icon">&#128269;</span>
+                    <input type="text" class="search-box" id="searchInput" placeholder="搜索书名、感悟、标签...">
+                </div>
+                <div class="search-count" id="searchCount"></div>
+                <div class="card-list" id="searchResults"></div>
+                <div class="empty-state" id="searchEmpty" style="display:none">
+                    <div class="empty-icon">&#128269;</div>
+                    <div class="empty-text">输入关键词开始搜索</div>
+                </div>
+            </div>
+
+            <!-- 设置页面 -->
+            <div class="page" id="page-settings">
+                <div class="setting-group">
+                    <button class="setting-item" id="btnExport" type="button">
+                        <div>
+                            <div class="setting-label">导出数据</div>
+                            <div class="setting-desc">将所有记录导出为 JSON 文件</div>
+                        </div>
+                        <span style="color: #6e6e73; font-size: 18px;">&#10145;</span>
+                    </button>
+                    <button class="setting-item" id="btnImport" type="button">
+                        <div>
+                            <div class="setting-label">导入数据</div>
+                            <div class="setting-desc">从 JSON 文件恢复记录</div>
+                        </div>
+                        <span style="color: #6e6e73; font-size: 18px;">&#11013;</span>
+                    </button>
+                </div>
+                <div style="padding: 0 16px;">
+                    <button class="btn-danger" id="btnClearAll" type="button">清空所有数据</button>
+                </div>
+                <input type="file" id="importFile" style="display:none" accept=".json">
+            </div>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item on" data-page="today" type="button">
+                <span class="nav-icon">&#128221;</span>
+                <span>今日</span>
+            </button>
+            <button class="nav-item" data-page="stats" type="button">
+                <span class="nav-icon">&#128202;</span>
+                <span>统计</span>
+            </button>
+            <button class="nav-item" data-page="search" type="button">
+                <span class="nav-icon">&#128269;</span>
+                <span>搜索</span>
+            </button>
+            <button class="nav-item" data-page="settings" type="button">
+                <span class="nav-icon">&#9881;</span>
+                <span>设置</span>
+            </button>
+        </nav>
+
+        <div class="toast" id="toast"></div>
+
+        <div class="modal-overlay" id="editModal">
+            <div class="modal-sheet">
+                <div class="modal-header">
+                    <span class="modal-title">修改产出</span>
+                    <button class="modal-close" id="btnCloseModal" type="button">&#10005;</button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">书名 / 内容</label>
+                    <input type="text" class="input-field" id="editBook" placeholder="书名">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">一句话产出</label>
+                    <textarea class="input-field" id="editInsight" placeholder="感悟..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">标签</label>
+                    <div class="tag-box" id="editTagBox">
+                        <button class="tag" data-tag="心理学" type="button">心理学</button>
+                        <button class="tag" data-tag="成长" type="button">成长</button>
+                        <button class="tag" data-tag="习惯" type="button">习惯</button>
+                        <button class="tag" data-tag="财商" type="button">财商</button>
+                        <button class="tag" data-tag="写作" type="button">写作</button>
+                        <button class="tag" data-tag="其他" type="button">其他</button>
+                    </div>
+                </div>
+                <button class="btn-primary" id="btnSaveEdit" type="button">保存修改</button>
+                <button class="btn-secondary" id="btnCancelEdit" type="button">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var records = [];
+        try {
+            records = JSON.parse(localStorage.getItem('readflow_records') || '[]');
+        } catch(e) {
+            records = [];
+        }
+
+        var selectedTag = '';
+        var editTag = '';
+        var editingId = null;
+        var currentStatsTab = 'day';
+        var statsSelectedDate = null;
+        var reviewIndex = 0;
+        var reviewCandidates = [];
+
+        var ALL_TAGS = ['心理学', '成长', '习惯', '财商', '写作', '其他'];
+        var TAG_COLORS = ['#007aff', '#34c759', '#ff9500', '#af52de', '#ff3b30', '#5ac8fa'];
+
+        function fmtDateInput(d) {
+            var y = d.getFullYear();
+            var m = String(d.getMonth() + 1).padStart(2, '0');
+            var day = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + day;
+        }
+
+        function escHtml(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function fmtTime(iso) {
+            var d = new Date(iso);
+            return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+        }
+
+        function fmtDate(iso) {
+            var d = new Date(iso);
+            return (d.getMonth() + 1) + '/' + d.getDate();
+        }
+
+        function showToast(msg) {
+            var toast = document.getElementById('toast');
+            if (!toast) return;
+            toast.textContent = msg;
+            toast.classList.add('on');
+            setTimeout(function() {
+                toast.classList.remove('on');
+            }, 2000);
+        }
+
+        function saveRecords() {
+            try {
+                localStorage.setItem('readflow_records', JSON.stringify(records));
+            } catch (e) {
+                showToast('保存失败，存储空间可能已满');
+            }
+        }
+
+        function init() {
+            updateDate();
+            bindAllEvents();
+            renderMiniStreak();
+            renderReview();
+            renderCards();
+            renderTrendChart();
+            renderTagRanking();
+
+            var picker = document.getElementById('statsDatePicker');
+            if (picker) picker.value = fmtDateInput(new Date());
+        }
+
+        function updateDate() {
+            var now = new Date();
+            var el = document.getElementById('currentDate');
+            if (el) el.textContent = now.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' });
+        }
+
+        function bindAllEvents() {
+            var navItems = document.querySelectorAll('.nav-item');
+            for (var i = 0; i < navItems.length; i++) {
+                navItems[i].addEventListener('click', function(e) {
+                    var page = this.getAttribute('data-page');
+                    if (page) switchPage(page, this);
+                });
+            }
+
+            // 卡片点击事件委托
+            var cardList = document.getElementById('cardList');
+            if (cardList) cardList.addEventListener('click', handleCardClick);
+
+            var searchResults = document.getElementById('searchResults');
+            if (searchResults) searchResults.addEventListener('click', handleCardClick);
+
+            // 热力图点击事件委托
+            var miniStreak = document.getElementById('miniStreak');
+            if (miniStreak) {
+                miniStreak.addEventListener('click', function(e) {
+                    var cell = e.target.closest('.mini-cell');
+                    if (cell) {
+                        var title = cell.getAttribute('title');
+                        if (title) {
+                            var parts = title.split(' · ');
+                            if (parts[0]) jumpToDate(parts[0]);
+                        }
+                    }
+                });
+            }
+
+            // 链接建议点击事件委托
+            var linkSuggest = document.getElementById('linkSuggest');
+            if (linkSuggest) {
+                linkSuggest.addEventListener('click', function(e) {
+                    var item = e.target.closest('.link-suggest-item');
+                    if (item) {
+                        var title = item.getAttribute('data-title');
+                        if (title) insertLink(title);
+                    }
+                });
+            }
+
+            var btnAdd = document.getElementById('btnAddRecord');
+            if (btnAdd) {
+                btnAdd.addEventListener('click', function() {
+                    addRecord();
+                });
+            }
+
+            var tagBox = document.getElementById('tagBox');
+            if (tagBox) {
+                tagBox.addEventListener('click', function(e) {
+                    var target = e.target;
+                    if (target.classList.contains('tag')) {
+                        selectTag(target);
+                    }
+                });
+            }
+
+            var editTagBox = document.getElementById('editTagBox');
+            if (editTagBox) {
+                editTagBox.addEventListener('click', function(e) {
+                    var target = e.target;
+                    if (target.classList.contains('tag')) {
+                        selectEditTag(target);
+                    }
+                });
+            }
+
+            var inputBook = document.getElementById('inputBook');
+            if (inputBook) {
+                inputBook.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        var insight = document.getElementById('inputInsight');
+                        if (insight) insight.focus();
+                    }
+                });
+            }
+
+            var inputInsight = document.getElementById('inputInsight');
+            if (inputInsight) {
+                inputInsight.addEventListener('input', function() {
+                    onInsightInput(this);
+                });
+            }
+
+            var statsTabs = document.querySelectorAll('.stats-tab');
+            for (var i = 0; i < statsTabs.length; i++) {
+                statsTabs[i].addEventListener('click', function() {
+                    var tab = this.getAttribute('data-tab');
+                    if (tab) setStatsTab(tab);
+                });
+            }
+
+            var statsDatePicker = document.getElementById('statsDatePicker');
+            if (statsDatePicker) {
+                statsDatePicker.addEventListener('change', function() {
+                    onStatsDateChange();
+                });
+            }
+
+            var btnResetDate = document.getElementById('btnResetDate');
+            if (btnResetDate) {
+                btnResetDate.addEventListener('click', function() {
+                    resetStatsDate();
+                });
+            }
+
+            var searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    doSearch();
+                });
+            }
+
+            var btnExport = document.getElementById('btnExport');
+            if (btnExport) {
+                btnExport.addEventListener('click', function() {
+                    exportData();
+                });
+            }
+
+            var btnImport = document.getElementById('btnImport');
+            if (btnImport) {
+                btnImport.addEventListener('click', function() {
+                    importData();
+                });
+            }
+
+            var btnClearAll = document.getElementById('btnClearAll');
+            if (btnClearAll) {
+                btnClearAll.addEventListener('click', function() {
+                    clearAll();
+                });
+            }
+
+            var importFile = document.getElementById('importFile');
+            if (importFile) {
+                importFile.addEventListener('change', function(e) {
+                    handleImport(e);
+                });
+            }
+
+            var btnCloseModal = document.getElementById('btnCloseModal');
+            if (btnCloseModal) {
+                btnCloseModal.addEventListener('click', function() {
+                    closeEditModal();
+                });
+            }
+
+            var btnSaveEdit = document.getElementById('btnSaveEdit');
+            if (btnSaveEdit) {
+                btnSaveEdit.addEventListener('click', function() {
+                    saveEdit();
+                });
+            }
+
+            var btnCancelEdit = document.getElementById('btnCancelEdit');
+            if (btnCancelEdit) {
+                btnCancelEdit.addEventListener('click', function() {
+                    closeEditModal();
+                });
+            }
+
+            var editModal = document.getElementById('editModal');
+            if (editModal) {
+                editModal.addEventListener('click', function(e) {
+                    if (e.target === editModal) {
+                        closeEditModal();
+                    }
+                });
+            }
+
+            var btnEditReview = document.getElementById('btnEditReview');
+            if (btnEditReview) {
+                btnEditReview.addEventListener('click', function() {
+                    editReview();
+                });
+            }
+
+            var btnNextReview = document.getElementById('btnNextReview');
+            if (btnNextReview) {
+                btnNextReview.addEventListener('click', function() {
+                    nextReview();
+                });
+            }
+        }
+
+        function switchPage(page, btn) {
+            var pages = document.querySelectorAll('.page');
+            for (var i = 0; i < pages.length; i++) {
+                pages[i].classList.remove('on');
+            }
+            var navItems = document.querySelectorAll('.nav-item');
+            for (var i = 0; i < navItems.length; i++) {
+                navItems[i].classList.remove('on');
+            }
+
+            var targetPage = document.getElementById('page-' + page);
+            if (targetPage) targetPage.classList.add('on');
+            if (btn) btn.classList.add('on');
+
+            var titles = { today: 'ReadFlow', stats: '数据洞察', search: '全局搜索', settings: '设置' };
+            var titleEl = document.getElementById('pageTitle');
+            if (titleEl) titleEl.textContent = titles[page] || 'ReadFlow';
+
+            if (page === 'stats') {
+                setTimeout(function() { setStatsTab(currentStatsTab); }, 50);
+            }
+            if (page === 'search') {
+                setTimeout(function() {
+                    var si = document.getElementById('searchInput');
+                    if (si) si.focus();
+                }, 100);
+            }
+        }
+
+        // 迷你热力图 - 仅7天
+        function renderMiniStreak() {
+            var container = document.getElementById('miniStreak');
+            if (!container) return;
+            var currentStreak = 0;
+
+            var sortedDates = [];
+            var dateSet = {};
+            for (var i = 0; i < records.length; i++) {
+                var ds = new Date(records[i].date).toDateString();
+                if (!dateSet[ds]) {
+                    dateSet[ds] = true;
+                    sortedDates.push(ds);
+                }
+            }
+            sortedDates.sort(function(a, b) {
+                return new Date(b) - new Date(a);
+            });
+
+            var today = new Date().toDateString();
+            var yesterday = new Date(Date.now() - 86400000).toDateString();
+
+            if (sortedDates.indexOf(today) !== -1) {
+                currentStreak = 1;
+                var check = new Date(Date.now() - 86400000);
+                while (sortedDates.indexOf(check.toDateString()) !== -1) {
+                    currentStreak++;
+                    check = new Date(check.getTime() - 86400000);
+                }
+            } else if (sortedDates.indexOf(yesterday) !== -1) {
+                currentStreak = 1;
+                var check2 = new Date(Date.now() - 2 * 86400000);
+                while (sortedDates.indexOf(check2.toDateString()) !== -1) {
+                    currentStreak++;
+                    check2 = new Date(check2.getTime() - 86400000);
+                }
+            }
+
+            var badge = document.getElementById('streakBadge');
+            if (badge) badge.textContent = currentStreak + ' 天';
+
+            var html = '<span class="mini-streak-label">近7天</span><div class="mini-heat">';
+            for (var i = 6; i >= 0; i--) {
+                var d = new Date(Date.now() - i * 86400000);
+                var ds = d.toDateString();
+                var count = 0;
+                for (var j = 0; j < records.length; j++) {
+                    if (new Date(records[j].date).toDateString() === ds) count++;
+                }
+                var level = 0;
+                if (count >= 4) level = 4;
+                else if (count >= 3) level = 3;
+                else if (count >= 2) level = 2;
+                else if (count >= 1) level = 1;
+                html += '<button class="mini-cell l' + level + '" type="button" title="' + fmtDateInput(d) + ' · ' + count + ' 条"></button>';
+            }
+            html += '</div>';
+            container.innerHTML = html;
+
+            // 事件已委托到 miniStreak
+        }
+
+        function jumpToDate(dateStr) {
+            statsSelectedDate = new Date(dateStr);
+            var picker = document.getElementById('statsDatePicker');
+            if (picker) picker.value = dateStr;
+
+            var navItems = document.querySelectorAll('.nav-item');
+            if (navItems.length > 1) {
+                switchPage('stats', navItems[1]);
+            }
+            setStatsTab('day');
+            var subtitle = document.getElementById('tagSubtitle');
+            if (subtitle) subtitle.textContent = dateStr + ' 标签分布';
+            renderTagRanking();
+        }
+
+        function renderReview() {
+            var box = document.getElementById('reviewBox');
+            var empty = document.getElementById('reviewEmpty');
+            if (!box || !empty) return;
+
+            var today = new Date().toDateString();
+            reviewCandidates = [];
+            for (var i = 0; i < records.length; i++) {
+                if (new Date(records[i].date).toDateString() !== today) {
+                    reviewCandidates.push(records[i]);
+                }
+            }
+
+            if (reviewCandidates.length === 0) {
+                box.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            empty.style.display = 'none';
+            box.style.display = 'block';
+            showReviewItem(0);
+        }
+
+        function showReviewItem(idx) {
+            if (reviewCandidates.length === 0) return;
+            reviewIndex = idx % reviewCandidates.length;
+            var r = reviewCandidates[reviewIndex];
+            var daysAgo = Math.floor((Date.now() - new Date(r.date).getTime()) / 86400000);
+
+            var agoEl = document.getElementById('reviewAgo');
+            var bookEl = document.getElementById('reviewBook');
+            var insightEl = document.getElementById('reviewInsight');
+
+            if (agoEl) agoEl.textContent = daysAgo + ' 天前';
+            if (bookEl) bookEl.textContent = r.book;
+            if (insightEl) insightEl.innerHTML = renderWikiLinks(r.insight);
+        }
+
+        function nextReview() {
+            showReviewItem(reviewIndex + 1);
+        }
+
+        function editReview() {
+            if (reviewCandidates.length === 0) return;
+            openEditModal(reviewCandidates[reviewIndex].id);
+        }
+
+        function onInsightInput(textarea) {
+            var val = textarea.value;
+            var suggest = document.getElementById('linkSuggest');
+            if (!suggest) return;
+
+            var match = val.match(/\[\[([^\]]*)$/);
+            if (!match) {
+                suggest.style.display = 'none';
+                return;
+            }
+
+            var query = match[1].toLowerCase();
+            var matches = [];
+            for (var i = 0; i < records.length && matches.length < 5; i++) {
+                if (records[i].book.toLowerCase().indexOf(query) !== -1) {
+                    matches.push(records[i]);
+                }
+            }
+
+            if (matches.length === 0) {
+                suggest.style.display = 'none';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < matches.length; i++) {
+                var title = escHtml(matches[i].book);
+                html += '<button class="link-suggest-item" data-title="' + title + '" type="button">' + title + '</button>';
+            }
+            suggest.innerHTML = html;
+            suggest.style.display = 'block';
+
+            // 事件已委托到 linkSuggest
+        }
+
+        function insertLink(bookTitle) {
+            var textarea = document.getElementById('inputInsight');
+            var suggest = document.getElementById('linkSuggest');
+            if (!textarea) return;
+            var val = textarea.value;
+            var newVal = val.replace(/\[\[[^\]]*$/, function() { return '[[' + bookTitle + ']]'; });
+            textarea.value = newVal;
+            if (suggest) suggest.style.display = 'none';
+            textarea.focus();
+        }
+
+        function renderWikiLinks(text) {
+            var escaped = escHtml(text);
+            return escaped.replace(/\[\[(.*?)\]\]/g, '<span class="wiki-link">$1</span>');
+        }
+
+        function selectTag(el) {
+            var tags = document.querySelectorAll('#tagBox .tag');
+            for (var i = 0; i < tags.length; i++) {
+                tags[i].classList.remove('on');
+            }
+            if (selectedTag === el.getAttribute('data-tag')) {
+                selectedTag = '';
+            } else {
+                el.classList.add('on');
+                selectedTag = el.getAttribute('data-tag');
+            }
+        }
+
+        function selectEditTag(el) {
+            var tags = document.querySelectorAll('#editTagBox .tag');
+            for (var i = 0; i < tags.length; i++) {
+                tags[i].classList.remove('on');
+            }
+            if (editTag === el.getAttribute('data-tag')) {
+                editTag = '';
+            } else {
+                el.classList.add('on');
+                editTag = el.getAttribute('data-tag');
+            }
+        }
+
+        function handleCardClick(e) {
+            var cardBtn = e.target.closest('.card-btn');
+            if (cardBtn) {
+                var id = parseInt(cardBtn.getAttribute('data-id'));
+                var action = cardBtn.getAttribute('data-action');
+                if (action === 'edit') {
+                    openEditModal(id);
+                } else if (action === 'delete') {
+                    deleteRecord(id);
+                }
+                return;
+            }
+            var card = e.target.closest('.card');
+            if (card) {
+                expandCard(card);
+            }
+        }
+
+        function addRecord() {
+            var book = document.getElementById('inputBook');
+            var insight = document.getElementById('inputInsight');
+            if (!book || !insight) return;
+
+            var bookVal = book.value.trim();
+            var insightVal = insight.value.trim();
+            if (!bookVal && !insightVal) {
+                showToast('请至少填写书名或感悟');
+                return;
+            }
+
+            var record = {
+                id: Date.now(),
+                book: bookVal || '未命名',
+                insight: insightVal || '无详细记录',
+                tag: selectedTag || '其他',
+                date: new Date().toISOString()
+            };
+            records.unshift(record);
+            saveRecords();
+
+            book.value = '';
+            insight.value = '';
+            var tags = document.querySelectorAll('#tagBox .tag');
+            for (var i = 0; i < tags.length; i++) {
+                tags[i].classList.remove('on');
+            }
+            selectedTag = '';
+
+            renderMiniStreak();
+            renderReview();
+            renderCards();
+            showToast('记录成功');
+        }
+
+        function renderCards() {
+            var list = document.getElementById('cardList');
+            var empty = document.getElementById('emptyState');
+            if (!list || !empty) return;
+
+            var today = new Date().toDateString();
+            var todayRecords = [];
+            for (var i = 0; i < records.length; i++) {
+                if (new Date(records[i].date).toDateString() === today) {
+                    todayRecords.push(records[i]);
+                }
+            }
+
+            var countEl = document.getElementById('todayCount');
+            if (countEl) countEl.textContent = todayRecords.length + ' 条';
+
+            if (todayRecords.length === 0) {
+                list.innerHTML = '';
+                empty.style.display = 'block';
+                return;
+            }
+            empty.style.display = 'none';
+
+            var html = '';
+            for (var i = 0; i < todayRecords.length; i++) {
+                var r = todayRecords[i];
+                html += '<div class="card" data-id="' + r.id + '">' +
+                    '<div class="card-book">' + escHtml(r.book) + '</div>' +
+                    '<div class="card-insight">' + renderWikiLinks(r.insight) + '</div>' +
+                    '<div class="card-meta">' +
+                    '<span class="card-tag">' + escHtml(r.tag) + '</span>' +
+                    '<span class="card-time">' + fmtTime(r.date) + '</span>' +
+                    '</div>' +
+                    '<div class="card-actions">' +
+                    '<button class="card-btn card-btn-edit" data-action="edit" data-id="' + r.id + '" type="button">&#9998;</button>' +
+                    '<button class="card-btn card-btn-delete" data-action="delete" data-id="' + r.id + '" type="button">&#128465;</button>' +
+                    '</div>' +
+                    '</div>';
+            }
+            list.innerHTML = html;
+
+            // 事件已委托到 cardList
+        }
+
+        function expandCard(card) {
+            var insight = card.querySelector('.card-insight');
+            if (!insight) return;
+            if (insight.style.webkitLineClamp === 'unset') {
+                insight.style.webkitLineClamp = '3';
+                insight.style.display = '-webkit-box';
+            } else {
+                insight.style.webkitLineClamp = 'unset';
+                insight.style.display = 'block';
+            }
+        }
+
+        function openEditModal(id) {
+            var r = null;
+            for (var i = 0; i < records.length; i++) {
+                if (records[i].id === id) {
+                    r = records[i];
+                    break;
+                }
+            }
+            if (!r) return;
+
+            editingId = id;
+            var editBook = document.getElementById('editBook');
+            var editInsight = document.getElementById('editInsight');
+            if (editBook) editBook.value = r.book;
+            if (editInsight) editInsight.value = r.insight;
+            editTag = r.tag;
+
+            var tags = document.querySelectorAll('#editTagBox .tag');
+            for (var i = 0; i < tags.length; i++) {
+                tags[i].classList.toggle('on', tags[i].getAttribute('data-tag') === r.tag);
+            }
+
+            var modal = document.getElementById('editModal');
+            if (modal) modal.classList.add('on');
+        }
+
+        function closeEditModal() {
+            var modal = document.getElementById('editModal');
+            if (modal) modal.classList.remove('on');
+            editingId = null;
+        }
+
+        function saveEdit() {
+            if (!editingId) return;
+            var editBook = document.getElementById('editBook');
+            var editInsight = document.getElementById('editInsight');
+            if (!editBook || !editInsight) return;
+
+            var bookVal = editBook.value.trim();
+            var insightVal = editInsight.value.trim();
+            if (!bookVal && !insightVal) {
+                showToast('内容不能为空');
+                return;
+            }
+
+            var idx = -1;
+            for (var i = 0; i < records.length; i++) {
+                if (records[i].id === editingId) {
+                    idx = i;
+                    break;
+                }
+            }
+
+            if (idx !== -1) {
+                records[idx].book = bookVal || '未命名';
+                records[idx].insight = insightVal || '无详细记录';
+                records[idx].tag = editTag || '其他';
+                saveRecords();
+                renderMiniStreak();
+                renderReview();
+                renderCards();
+                closeEditModal();
+                showToast('修改已保存');
+            }
+        }
+
+        function deleteRecord(id) {
+            if (typeof confirm !== 'function' || !confirm('确定删除这条记录？')) return;
+            var newRecords = [];
+            for (var i = 0; i < records.length; i++) {
+                if (records[i].id !== id) {
+                    newRecords.push(records[i]);
+                }
+            }
+            records = newRecords;
+            saveRecords();
+            renderMiniStreak();
+            renderReview();
+            renderCards();
+            showToast('已删除');
+        }
+
+        function setStatsTab(tab) {
+            currentStatsTab = tab;
+            var tabs = document.querySelectorAll('.stats-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('on');
+            }
+            var activeTab = document.querySelector('.stats-tab[data-tab="' + tab + '"]');
+            if (activeTab) activeTab.classList.add('on');
+
+            var titles = { day: '近7天产出趋势', week: '近4周产出趋势', month: '近30天产出趋势' };
+            var subtitles = { day: '今日标签分布', week: '本周标签分布', month: '本月标签分布' };
+
+            var trendTitle = document.getElementById('trendTitle');
+            var tagSubtitle = document.getElementById('tagSubtitle');
+            if (trendTitle) trendTitle.textContent = titles[tab] || titles.day;
+            if (tagSubtitle) tagSubtitle.textContent = subtitles[tab] || subtitles.day;
+
+            var dateRow = document.getElementById('dateRow');
+            if (dateRow) {
+                dateRow.style.display = (tab === 'day') ? 'flex' : 'none';
+                if (tab !== 'day') statsSelectedDate = null;
+            }
+
+            renderTrendChart();
+            renderTagRanking();
+        }
+
+        function onStatsDateChange() {
+            var picker = document.getElementById('statsDatePicker');
+            if (!picker) return;
+            var val = picker.value;
+            if (val) {
+                statsSelectedDate = new Date(val);
+                var subtitle = document.getElementById('tagSubtitle');
+                if (subtitle) subtitle.textContent = val + ' 标签分布';
+                renderTagRanking();
+            }
+        }
+
+        function resetStatsDate() {
+            var picker = document.getElementById('statsDatePicker');
+            if (picker) picker.value = fmtDateInput(new Date());
+            statsSelectedDate = null;
+            var subtitle = document.getElementById('tagSubtitle');
+            if (subtitle) subtitle.textContent = '今日标签分布';
+            renderTagRanking();
+        }
+
+        function renderTrendChart() {
+            var chart = document.getElementById('trendChart');
+            if (!chart) return;
+            var labels = [], counts = [];
+
+            if (currentStatsTab === 'day') {
+                var dayNames = ['日','一','二','三','四','五','六'];
+                for (var i = 6; i >= 0; i--) {
+                    var d = new Date(Date.now() - i * 86400000);
+                    labels.push(dayNames[d.getDay()]);
+                    var ds = d.toDateString();
+                    var count = 0;
+                    for (var j = 0; j < records.length; j++) {
+                        if (new Date(records[j].date).toDateString() === ds) count++;
+                    }
+                    counts.push(count);
+                }
+            } else if (currentStatsTab === 'week') {
+                for (var i = 3; i >= 0; i--) {
+                    var end = new Date(Date.now() - i * 7 * 86400000);
+                    var start = new Date(end.getTime() - 6 * 86400000);
+                    labels.push('W' + (4 - i));
+                    var count = 0;
+                    for (var j = 0; j < records.length; j++) {
+                        var rd = new Date(records[j].date);
+                        if (rd >= start && rd <= end) count++;
+                    }
+                    counts.push(count);
+                }
+            } else {
+                for (var i = 29; i >= 0; i -= 5) {
+                    var d = new Date(Date.now() - i * 86400000);
+                    labels.push((d.getMonth() + 1) + '/' + d.getDate());
+                    var start = new Date(Date.now() - i * 86400000);
+                    var end = new Date(Date.now() - Math.max(0, i - 4) * 86400000);
+                    var count = 0;
+                    for (var j = 0; j < records.length; j++) {
+                        var rd = new Date(records[j].date);
+                        if (rd >= start && rd <= end) count++;
+                    }
+                    counts.push(count);
+                }
+            }
+
+            var max = 0;
+            for (var i = 0; i < counts.length; i++) {
+                if (counts[i] > max) max = counts[i];
+            }
+            if (max < 1) max = 1;
+
+            var html = '';
+            for (var i = 0; i < labels.length; i++) {
+                var h = Math.round(counts[i] / max * 100);
+                html += '<div class="bar-item">' +
+                    '<span class="bar-value">' + counts[i] + '</span>' +
+                    '<div class="bar" style="height: ' + h + '%"></div>' +
+                    '<span class="bar-label">' + labels[i] + '</span>' +
+                    '</div>';
+            }
+            chart.innerHTML = html;
+        }
+
+        function renderTagRanking() {
+            var container = document.getElementById('tagRanking');
+            if (!container) return;
+            var filtered = [];
+
+            if (currentStatsTab === 'day') {
+                if (statsSelectedDate) {
+                    var ds = statsSelectedDate.toDateString();
+                    for (var i = 0; i < records.length; i++) {
+                        if (new Date(records[i].date).toDateString() === ds) {
+                            filtered.push(records[i]);
+                        }
+                    }
+                } else {
+                    var today = new Date().toDateString();
+                    for (var i = 0; i < records.length; i++) {
+                        if (new Date(records[i].date).toDateString() === today) {
+                            filtered.push(records[i]);
+                        }
+                    }
+                }
+            } else if (currentStatsTab === 'week') {
+                var weekAgo = new Date(Date.now() - 7 * 86400000);
+                for (var i = 0; i < records.length; i++) {
+                    if (new Date(records[i].date) >= weekAgo) {
+                        filtered.push(records[i]);
+                    }
+                }
+            } else {
+                var monthAgo = new Date(Date.now() - 30 * 86400000);
+                for (var i = 0; i < records.length; i++) {
+                    if (new Date(records[i].date) >= monthAgo) {
+                        filtered.push(records[i]);
+                    }
+                }
+            }
+
+            var tagCounts = {};
+            for (var i = 0; i < filtered.length; i++) {
+                var tag = filtered[i].tag;
+                tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+            }
+
+            var sorted = [];
+            for (var tag in tagCounts) {
+                sorted.push([tag, tagCounts[tag]]);
+            }
+            sorted.sort(function(a, b) { return b[1] - a[1]; });
+
+            var max = sorted[0] ? sorted[0][1] : 1;
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#aeaeb2;padding:20px;font-size:14px;">暂无数据</div>';
+                return;
+            }
+
+            var html = '';
+            for (var i = 0; i < sorted.length; i++) {
+                var tag = sorted[i][0];
+                var count = sorted[i][1];
+                var colorIdx = ALL_TAGS.indexOf(tag);
+                if (colorIdx === -1) colorIdx = i;
+                var color = TAG_COLORS[colorIdx % TAG_COLORS.length];
+                var w = Math.round(count / max * 100);
+                html += '<div class="rank-item">' +
+                    '<span class="rank-label">' + tag + '</span>' +
+                    '<div class="rank-bar-bg">' +
+                    '<div class="rank-bar-fill" style="width: ' + w + '%; background: ' + color + '"></div>' +
+                    '</div>' +
+                    '<span class="rank-value">' + count + '</span>' +
+                    '</div>';
+            }
+            container.innerHTML = html;
+        }
+
+        function doSearch() {
+            var input = document.getElementById('searchInput');
+            var container = document.getElementById('searchResults');
+            var empty = document.getElementById('searchEmpty');
+            var countEl = document.getElementById('searchCount');
+            if (!input || !container || !empty) return;
+
+            var query = input.value.trim().toLowerCase();
+            if (!query) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                if (countEl) countEl.textContent = '';
+                return;
+            }
+
+            var results = [];
+            for (var i = 0; i < records.length; i++) {
+                var r = records[i];
+                if (r.book.toLowerCase().indexOf(query) !== -1 ||
+                    r.insight.toLowerCase().indexOf(query) !== -1 ||
+                    r.tag.toLowerCase().indexOf(query) !== -1) {
+                    results.push(r);
+                }
+            }
+
+            if (countEl) countEl.textContent = '找到 ' + results.length + ' 条记录';
+
+            if (results.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+                var txt = empty.querySelector('.empty-text');
+                if (txt) txt.textContent = '没有找到相关记录';
+                return;
+            }
+
+            empty.style.display = 'none';
+            var html = '';
+            for (var i = 0; i < results.length; i++) {
+                var r = results[i];
+                html += '<div class="card" data-id="' + r.id + '">' +
+                    '<div class="card-book">' + hl(escHtml(r.book), query) + '</div>' +
+                    '<div class="card-insight">' + hl(renderWikiLinks(r.insight), query) + '</div>' +
+                    '<div class="card-meta">' +
+                    '<span class="card-tag">' + escHtml(r.tag) + '</span>' +
+                    '<span class="card-time">' + fmtDate(r.date) + ' ' + fmtTime(r.date) + '</span>' +
+                    '</div>' +
+                    '<div class="card-actions">' +
+                    '<button class="card-btn card-btn-edit" data-action="edit" data-id="' + r.id + '" type="button">&#9998;</button>' +
+                    '<button class="card-btn card-btn-delete" data-action="delete" data-id="' + r.id + '" type="button">&#128465;</button>' +
+                    '</div>' +
+                    '</div>';
+            }
+            container.innerHTML = html;
+
+            // 事件已委托到 searchResults
+        }
+
+        function hl(text, query) {
+            if (!query) return text;
+            var regex = new RegExp('(' + escReg(query) + ')', 'gi');
+            return text.replace(regex, function(match) {
+                return '<span class="highlight">' + match + '</span>';
+            });
+        }
+
+        function escReg(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function exportData() {
+            var data = JSON.stringify(records, null, 2);
+            var blob = new Blob([data], { type: 'application/json' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'readflow_backup_' + fmtDateInput(new Date()) + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('导出成功');
+        }
+
+        function importData() {
+            var fileInput = document.getElementById('importFile');
+            if (fileInput) fileInput.click();
+        }
+
+        function handleImport(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    var data = JSON.parse(event.target.result);
+                    if (Array.isArray(data)) {
+                        records = data;
+                        saveRecords();
+                        renderMiniStreak();
+                        renderReview();
+                        renderCards();
+                        renderTrendChart();
+                        renderTagRanking();
+                        showToast('导入成功');
+                    } else {
+                        showToast('文件格式错误');
+                    }
+                } catch(err) {
+                    showToast('导入失败');
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = '';
+        }
+
+        function clearAll() {
+            if (typeof confirm !== 'function' || !confirm('确定清空所有记录？此操作不可恢复。')) return;
+            records = [];
+            localStorage.removeItem('readflow_records');
+            renderMiniStreak();
+            renderReview();
+            renderCards();
+            renderTrendChart();
+            renderTagRanking();
+            showToast('已清空');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+        // PWA Service Worker 注册
+        if ('serviceWorker' in navigator) {
+            var swCode = "self.addEventListener('install', function(e){self.skipWaiting();});self.addEventListener('activate', function(e){e.waitUntil(self.clients.claim());});self.addEventListener('fetch', function(e){e.respondWith(fetch(e.request).catch(function(){return new Response('Offline');}));});";
+            var swBlob = new Blob([swCode], {type: 'application/javascript'});
+            var swUrl = URL.createObjectURL(swBlob);
+            navigator.serviceWorker.register(swUrl).catch(function(){});
+        }
+
+    </script>
+</body>
+</html>
