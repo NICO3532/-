@@ -252,7 +252,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 /* ═══════════════════════════════════════════════════════════════
    TIMELINE — Apple Card Style
    ═══════════════════════════════════════════════════════════════ */
-.timeline { display:flex; flex-direction:column; gap:0; max-width:800px; position:relative; }
+.timeline { display:flex; flex-direction:column; gap:0; max-width:800px; position:relative; width:100%; flex:1; }
 .timeline::before { content:''; position:absolute; left:20px; top:0; bottom:0; width:2px; background:var(--separator); border-radius:1px; }
 .timeline-item { position:relative; padding-left:48px; padding-bottom:var(--space-5); transition:all var(--duration-slow) var(--ease-standard); }
 .timeline-item.removing { opacity:0; transform:translateX(-30px) scale(0.95); max-height:0; padding-bottom:0; overflow:hidden; }
@@ -286,12 +286,12 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 /* ═══════════════════════════════════════════════════════════════
    EMPTY STATE — 世界级零状态（巨大按钮，无法忽视）
    ═══════════════════════════════════════════════════════════════ */
-.empty-state { text-align:center; padding:var(--space-6) var(--space-4); color:var(--text-secondary); max-width:400px; margin:0 auto; animation:fadeInUp 0.6s var(--ease-decelerate) forwards; flex:1; display:flex; flex-direction:column; justify-content:center; }
+.empty-state { text-align:center; color:var(--text-secondary); animation:fadeInUp 0.6s var(--ease-decelerate) forwards; width:100%; flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; padding:var(--space-4); box-sizing:border-box; }
 @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-.empty-icon { font-size:48px; margin-bottom:var(--space-3); opacity:0.15; filter:grayscale(0.3); animation:float 3s ease-in-out infinite; }
+.empty-icon { font-size:56px; margin-bottom:var(--space-3); opacity:0.15; filter:grayscale(0.3); animation:float 3s ease-in-out infinite; }
 @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
-.empty-text { font-size:20px; font-weight:700; margin-bottom:var(--space-2); color:var(--text-primary); letter-spacing:-0.3px; }
-.empty-sub { font-size:14px; color:var(--text-tertiary); line-height:1.6; margin-bottom:var(--space-5); }
+.empty-text { font-size:18px; font-weight:700; margin-bottom:var(--space-2); color:var(--text-primary); letter-spacing:-0.3px; }
+.empty-sub { font-size:14px; color:var(--text-tertiary); line-height:1.6; margin-bottom:var(--space-4); }
 .empty-action { 
   padding:14px 40px; 
   border-radius:var(--radius-pill); 
@@ -538,10 +538,10 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .m-header-date { font-size:12px; color:var(--text-secondary); font-weight:600; }
 .m-streak { font-size:12px; color:var(--accent); font-weight:700; background:var(--accent-soft); padding:5px 14px; border-radius:var(--radius-pill); border:1px solid var(--accent-soft); transition:all var(--duration-fast); }
 .m-streak.pulse { animation:countPulse 0.6s var(--ease-spring); }
-.m-main { flex:1; overflow-y:auto; padding:0; scrollbar-width:none; overscroll-behavior-y:contain; }
+.m-main { flex:1; overflow-y:auto; scrollbar-width:none; overscroll-behavior-y:contain; -webkit-overflow-scrolling:touch; position:relative; width:100%; display:flex; flex-direction:column; }
 .m-main::-webkit-scrollbar { display:none; }
 
-.m-bottom-nav { position:fixed; bottom:calc(4px + env(safe-area-inset-bottom, 0px)); left:50%; transform:translateX(-50%); background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border:1px solid var(--glass-border); border-radius:var(--radius-liquid); padding:8px 16px; display:flex; justify-content:center; align-items:center; gap:4px; z-index:100; box-shadow:var(--shadow-lg); max-width:calc(100% - 32px); transition:all var(--duration-normal); }
+.m-bottom-nav { position:fixed; bottom:calc(2px + env(safe-area-inset-bottom, 0px)); left:50%; transform:translateX(-50%); margin:0; } background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border:1px solid var(--glass-border); border-radius:var(--radius-liquid); padding:8px 16px; display:flex; justify-content:center; align-items:center; gap:4px; z-index:100; box-shadow:var(--shadow-lg); max-width:calc(100% - 32px); transition:all var(--duration-normal); }
 .m-bottom-nav::before { content:''; position:absolute; inset:0; border-radius:var(--radius-liquid); background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0)); pointer-events:none; }
 @media (prefers-color-scheme: dark) { .m-bottom-nav::before { background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0)); } }
 .m-nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 14px; border-radius:var(--radius-pill); color:var(--text-tertiary); border:none; background:none; font-size:10px; font-weight:700; flex:1; min-width:52px; transition:all var(--duration-fast); position:relative; z-index:1; min-height:var(--touch-min); }
@@ -550,8 +550,8 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .m-nav-item.on .m-nav-icon { transform:scale(1.15); }
 .m-nav-label { transition:opacity var(--duration-fast); }
 
-.m-page { display:none; }
-.m-page.on { display:block; animation:pageFadeIn 0.3s var(--ease-decelerate); }
+.m-page { display:none; width:100%; min-height:100%; }
+.m-page.on { display:flex; flex-direction:column; flex:1; animation:pageFadeIn 0.3s var(--ease-decelerate); }
 
 /* 移动端快速输入条 */
 .m-quick-input-bar { 
@@ -560,13 +560,12 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
   padding:10px var(--space-4); 
   border:1.5px solid var(--separator-subtle); 
   box-shadow:var(--shadow-sm); 
-  margin-bottom:var(--space-3); 
   cursor:text; 
   transition:all var(--duration-fast); 
   display:flex; 
   align-items:center; 
   gap:var(--space-2); 
-  margin-top:var(--space-2);
+  margin:var(--space-2) var(--space-4) var(--space-3); 
 }
 .m-quick-input-bar:hover { 
   border-color:var(--accent); 
@@ -611,13 +610,13 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
   transform:scale(0.95); 
 }
 
-.m-timeline { display:flex; flex-direction:column; gap:0; margin-top:var(--space-2); position:relative; }
+.m-timeline { display:none; flex-direction:column; gap:0; padding:var(--space-2) var(--space-4); position:relative; width:100%; flex:1; }
 .m-timeline::before { content:''; position:absolute; left:16px; top:0; bottom:0; width:2px; background:var(--separator); border-radius:1px; }
 .m-timeline-item { position:relative; padding-left:40px; padding-bottom:var(--space-4); transition:all var(--duration-slow) var(--ease-standard); }
 .m-timeline-item.removing { opacity:0; transform:translateX(-20px) scale(0.95); max-height:0; padding-bottom:0; overflow:hidden; }
 .m-timeline-dot { position:absolute; left:11px; top:20px; width:12px; height:12px; border-radius:50%; background:var(--accent); border:3px solid var(--bg-primary); z-index:2; box-shadow:0 0 0 2px var(--accent-soft); }
 
-.m-record-card { background:var(--bg-secondary); border-radius:var(--radius-lg); padding:var(--space-4); border:1px solid var(--separator-subtle); box-shadow:var(--shadow-sm); animation:cardIn var(--duration-slow) var(--ease-decelerate) forwards; opacity:0; transform:translateY(12px) scale(0.98); will-change:transform,opacity; }
+.m-record-card { background:var(--bg-secondary); border-radius:var(--radius-lg); padding:var(--space-4); border:1px solid var(--separator-subtle); box-shadow:var(--shadow-sm); margin-bottom:var(--space-3); } animation:cardIn var(--duration-slow) var(--ease-decelerate) forwards; opacity:0; transform:translateY(12px) scale(0.98); will-change:transform,opacity; }
 .m-record-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:var(--space-2); gap:var(--space-2); }
 .m-record-card-book { font-size:16px; font-weight:700; line-height:1.4; flex:1; color:var(--text-primary); letter-spacing:-0.2px; }
 .m-record-card-actions { display:flex; gap:4px; }
@@ -636,7 +635,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .toast { position:fixed; top:calc(12px + env(safe-area-inset-top, 0px)); left:50%; transform:translateX(-50%) translateY(-20px); background:var(--text-primary); color:var(--text-inverse); padding:12px 24px; border-radius:var(--radius-pill); font-size:14px; font-weight:600; opacity:0; transition:all var(--duration-slow) var(--ease-spring); z-index:300; pointer-events:none; white-space:nowrap; box-shadow:var(--shadow-lg); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
 .toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 
-.m-today-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:var(--space-2); padding:0 var(--space-4); }
+.m-today-header { display:flex; align-items:flex-end; justify-content:space-between; padding:var(--space-2) var(--space-4); }
 .m-today-header-left { display:flex; flex-direction:column; gap:1px; }
 .m-today-header-weekday { font-size:12px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; letter-spacing:0.8px; }
 .m-today-header-date-row { display:flex; align-items:center; gap:var(--space-2); }
@@ -645,7 +644,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .m-today-header-count { font-size:12px; color:var(--text-secondary); font-weight:600; background:var(--bg-secondary); padding:4px 12px; border-radius:var(--radius-pill); border:1px solid var(--separator-subtle); transition:all var(--duration-fast); }
 .m-today-header-count.pulse { animation:countPulse 0.6s var(--ease-spring); }
 
-.m-history-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-4); padding:0 4px; }
+.m-history-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:var(--space-4); padding:var(--space-3) var(--space-4) 0; }
 .m-history-nav { display:flex; gap:var(--space-2); align-items:center; }
 .m-history-nav-btn { width:32px; height:32px; border-radius:50%; border:1px solid var(--separator-subtle); background:var(--bg-secondary); color:var(--text-secondary); font-size:13px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all var(--duration-fast); min-height:var(--touch-min); position:relative; overflow:hidden; }
 .m-history-nav-btn:hover { background:var(--accent-soft); color:var(--accent); }
@@ -653,7 +652,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .m-history-nav-btn::after { content:''; position:absolute; inset:0; background:var(--accent); opacity:0; transition:opacity var(--duration-fast); border-radius:inherit; }
 .m-history-nav-btn:active::after { opacity:0.1; }
 .m-history-nav-month { font-size:15px; font-weight:700; color:var(--text-primary); }
-.m-history-calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:var(--space-4); }
+.m-history-calendar { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:var(--space-4); padding:0 var(--space-4); }
 .m-history-cal-header { font-size:10px; font-weight:700; color:var(--text-tertiary); text-align:center; padding:4px 0; }
 .m-history-cal-cell { aspect-ratio:1; border-radius:var(--radius-md); background:var(--bg-secondary); border:1px solid var(--separator-subtle); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; cursor:pointer; transition:all var(--duration-fast); color:var(--text-primary); min-height:var(--touch-min); position:relative; overflow:hidden; }
 .m-history-cal-cell.other-month { color:var(--text-quaternary); background:var(--bg-primary); }
@@ -663,7 +662,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .m-history-cal-cell::after { content:''; position:absolute; inset:0; background:var(--accent); opacity:0; transition:opacity var(--duration-fast); }
 .m-history-cal-cell:active::after { opacity:0.15; }
 
-.m-on-this-day { background:var(--bg-secondary); border-radius:var(--radius-lg); padding:var(--space-4); border:1px solid var(--separator-subtle); margin-bottom:var(--space-4); position:relative; overflow:hidden; animation:fadeInUp 0.5s var(--ease-decelerate) forwards; }
+.m-on-this-day { background:var(--bg-secondary); border-radius:var(--radius-lg); padding:var(--space-4); border:1px solid var(--separator-subtle); margin-bottom:var(--space-4); position:relative; overflow:hidden; margin:var(--space-3) var(--space-4) var(--space-4); } animation:fadeInUp 0.5s var(--ease-decelerate) forwards; }
 .m-on-this-day::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, var(--warning), var(--accent), var(--purple)); opacity:0.6; }
 .m-on-this-day-title { font-size:16px; font-weight:700; color:var(--text-primary); margin-bottom:var(--space-2); }
 .m-on-this-day-sub { font-size:12px; color:var(--text-secondary); margin-bottom:var(--space-3); }
@@ -1011,7 +1010,7 @@ button { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; }
 <div class="mobile-app" id="mobileApp">
   <header class="m-header"><div class="m-header-title">ReadFlow</div><div class="m-streak" id="mStreak">0 天</div></header>
   <main class="m-main" id="mMain">
-    <div class="m-page on" id="m-today" style="padding:0 var(--space-4);">
+    <div class="m-page on" id="m-today">
       <div class="m-today-header">
         <div class="m-today-header-left">
           <div class="m-today-header-weekday" id="mTodayWeekday"></div>
@@ -1037,7 +1036,7 @@ button { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; }
       </div>
     </div>
 
-    <div class="m-page" id="m-history" style="padding:0 var(--space-4);">
+    <div class="m-page" id="m-history">
       <div class="m-on-this-day" id="mOnThisDay">
         <div class="m-on-this-day-title">&#127775; 那年今日</div>
         <div class="m-on-this-day-sub" id="mOnThisDaySub">看看过去的今天，你记录了什么</div>
@@ -1054,8 +1053,8 @@ button { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; }
       <div id="mHistoryDayView"></div>
     </div>
 
-    <div class="m-page" id="m-stats" style="padding:0 var(--space-4);">
-      <div style="padding:0 4px;margin-bottom:var(--space-4);"><span style="font-size:20px;font-weight:800;letter-spacing:-0.3px;">数据洞察</span></div>
+    <div class="m-page" id="m-stats">
+      <div style="padding:var(--space-3) var(--space-4) var(--space-2);margin-bottom:var(--space-4);"><span style="font-size:20px;font-weight:800;letter-spacing:-0.3px;">数据洞察</span></div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);margin-bottom:var(--space-4);">
         <div class="m-stat-card"><div class="m-stat-label">本月记录</div><div class="m-stat-value" style="color:var(--accent);" id="mStatTotal">0</div></div>
         <div class="m-stat-card"><div class="m-stat-label">最长连续</div><div class="m-stat-value" style="color:var(--success);" id="mStatStreak">0</div></div>
@@ -1064,8 +1063,8 @@ button { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; }
       <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:var(--space-5);border:1px solid var(--separator-subtle);margin-bottom:var(--space-4);"><div style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:var(--space-3);">情绪分布</div><div id="mMoodChart"></div></div>
       <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:var(--space-5);border:1px solid var(--separator-subtle);"><div style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:var(--space-3);">近7天产出</div><div id="mTrendChart"></div></div>
     </div>
-    <div class="m-page" id="m-search" style="padding:0 var(--space-4);"><div class="search-wrap"><span class="search-icon">&#128269;</span><input type="text" class="search-input" id="mSearchInput" placeholder="搜索书名、感悟、标签..." aria-label="搜索"></div><div id="mSearchResults"></div></div>
-    <div class="m-page" id="m-settings" style="padding:0 var(--space-4);">
+    <div class="m-page" id="m-search"><div class="search-wrap" style="padding:var(--space-3) var(--space-4);"><span class="search-icon">&#128269;</span><input type="text" class="search-input" id="mSearchInput" placeholder="搜索书名、感悟、标签..." aria-label="搜索"></div><div id="mSearchResults"></div></div>
+    <div class="m-page" id="m-settings" style="padding:var(--space-3) var(--space-4);">
       <div class="setting-group"><button class="setting-item" id="mBtnExport" type="button"><div><div class="setting-label">导出数据</div><div class="setting-desc">将所有记录导出为 JSON</div></div><span class="setting-arrow">&#10132;</span></button><button class="setting-item" id="mBtnImport" type="button"><div><div class="setting-label">导入数据</div><div class="setting-desc">从 JSON 文件恢复</div></div><span class="setting-arrow">&#10132;</span></button></div>
       <div class="data-diag">
         <div class="data-diag-title">&#128202; 数据健康诊断</div>
@@ -1950,10 +1949,12 @@ button { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; }
     // 控制快速输入条和空状态的显示
     if (todayRec.length === 0) {
       timeline.innerHTML = '';
-      if (empty) empty.style.display = 'block';
+      timeline.style.display = 'none';
+      if (empty) { empty.style.display = 'flex'; }
       if (quickInput) quickInput.style.display = 'none';
       return;
     }
+    timeline.style.display = 'flex';
     if (empty) empty.style.display = 'none';
     if (quickInput) quickInput.style.display = 'flex';
 
@@ -2001,10 +2002,12 @@ button { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; }
 
     if (todayRec.length === 0) {
       timeline.innerHTML = '';
-      if (empty) empty.style.display = 'block';
+      timeline.style.display = 'none';
+      if (empty) { empty.style.display = 'flex'; }
       if (quickInput) quickInput.style.display = 'none';
       return;
     }
+    timeline.style.display = 'flex';
     if (empty) empty.style.display = 'none';
     if (quickInput) quickInput.style.display = 'flex';
 
