@@ -2,9 +2,11 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, minimal-ui">
 <title>ReadFlow</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ReadFlow">
 <meta name="description" content="ReadFlow - 阅读记录与知识管理">
@@ -284,9 +286,9 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 /* ═══════════════════════════════════════════════════════════════
    EMPTY STATE — 世界级零状态（巨大按钮，无法忽视）
    ═══════════════════════════════════════════════════════════════ */
-.empty-state { text-align:center; padding:var(--space-12) var(--space-5); color:var(--text-secondary); max-width:400px; margin:0 auto; animation:fadeInUp 0.6s var(--ease-decelerate) forwards; }
+.empty-state { text-align:center; padding:var(--space-6) var(--space-4); color:var(--text-secondary); max-width:400px; margin:0 auto; animation:fadeInUp 0.6s var(--ease-decelerate) forwards; flex:1; display:flex; flex-direction:column; justify-content:center; }
 @keyframes fadeInUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
-.empty-icon { font-size:64px; margin-bottom:var(--space-4); opacity:0.15; filter:grayscale(0.3); animation:float 3s ease-in-out infinite; }
+.empty-icon { font-size:48px; margin-bottom:var(--space-3); opacity:0.15; filter:grayscale(0.3); animation:float 3s ease-in-out infinite; }
 @keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);} }
 .empty-text { font-size:20px; font-weight:700; margin-bottom:var(--space-2); color:var(--text-primary); letter-spacing:-0.3px; }
 .empty-sub { font-size:14px; color:var(--text-tertiary); line-height:1.6; margin-bottom:var(--space-5); }
@@ -532,14 +534,14 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 @media (max-width: 1023px) { .mobile-app { display:flex; } }
 
 .m-header { padding:calc(var(--space-4) + env(safe-area-inset-top, 0px)) var(--space-5) var(--space-2); display:flex; justify-content:space-between; align-items:center; flex-shrink:0; position:sticky; top:0; z-index:20; background:var(--bg-primary); }
-.m-header-title { font-size:26px; font-weight:800; letter-spacing:-0.5px; color:var(--text-primary); }
+.m-header-title { font-size:22px; font-weight:800; letter-spacing:-0.5px; color:var(--text-primary); }
 .m-header-date { font-size:12px; color:var(--text-secondary); font-weight:600; }
 .m-streak { font-size:12px; color:var(--accent); font-weight:700; background:var(--accent-soft); padding:5px 14px; border-radius:var(--radius-pill); border:1px solid var(--accent-soft); transition:all var(--duration-fast); }
 .m-streak.pulse { animation:countPulse 0.6s var(--ease-spring); }
-.m-main { flex:1; overflow-y:auto; padding:0 var(--space-4) 120px; scrollbar-width:none; overscroll-behavior-y:contain; }
+.m-main { flex:1; overflow-y:auto; padding:0; scrollbar-width:none; overscroll-behavior-y:contain; }
 .m-main::-webkit-scrollbar { display:none; }
 
-.m-bottom-nav { position:fixed; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); left:50%; transform:translateX(-50%); background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border:1px solid var(--glass-border); border-radius:var(--radius-liquid); padding:8px 16px; display:flex; justify-content:center; align-items:center; gap:4px; z-index:100; box-shadow:var(--shadow-lg); max-width:calc(100% - 32px); transition:all var(--duration-normal); }
+.m-bottom-nav { position:fixed; bottom:calc(4px + env(safe-area-inset-bottom, 0px)); left:50%; transform:translateX(-50%); background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border:1px solid var(--glass-border); border-radius:var(--radius-liquid); padding:8px 16px; display:flex; justify-content:center; align-items:center; gap:4px; z-index:100; box-shadow:var(--shadow-lg); max-width:calc(100% - 32px); transition:all var(--duration-normal); }
 .m-bottom-nav::before { content:''; position:absolute; inset:0; border-radius:var(--radius-liquid); background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0)); pointer-events:none; }
 @media (prefers-color-scheme: dark) { .m-bottom-nav::before { background:linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0)); } }
 .m-nav-item { display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; padding:6px 14px; border-radius:var(--radius-pill); color:var(--text-tertiary); border:none; background:none; font-size:10px; font-weight:700; flex:1; min-width:52px; transition:all var(--duration-fast); position:relative; z-index:1; min-height:var(--touch-min); }
@@ -555,15 +557,16 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .m-quick-input-bar { 
   background:var(--bg-secondary); 
   border-radius:var(--radius-lg); 
-  padding:var(--space-3) var(--space-4); 
+  padding:10px var(--space-4); 
   border:1.5px solid var(--separator-subtle); 
   box-shadow:var(--shadow-sm); 
-  margin-bottom:var(--space-4); 
+  margin-bottom:var(--space-3); 
   cursor:text; 
   transition:all var(--duration-fast); 
   display:flex; 
   align-items:center; 
   gap:var(--space-2); 
+  margin-top:var(--space-2);
 }
 .m-quick-input-bar:hover { 
   border-color:var(--accent); 
@@ -608,7 +611,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
   transform:scale(0.95); 
 }
 
-.m-timeline { display:flex; flex-direction:column; gap:0; margin-top:var(--space-1); position:relative; }
+.m-timeline { display:flex; flex-direction:column; gap:0; margin-top:var(--space-2); position:relative; }
 .m-timeline::before { content:''; position:absolute; left:16px; top:0; bottom:0; width:2px; background:var(--separator); border-radius:1px; }
 .m-timeline-item { position:relative; padding-left:40px; padding-bottom:var(--space-4); transition:all var(--duration-slow) var(--ease-standard); }
 .m-timeline-item.removing { opacity:0; transform:translateX(-20px) scale(0.95); max-height:0; padding-bottom:0; overflow:hidden; }
@@ -633,11 +636,11 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .toast { position:fixed; top:calc(12px + env(safe-area-inset-top, 0px)); left:50%; transform:translateX(-50%) translateY(-20px); background:var(--text-primary); color:var(--text-inverse); padding:12px 24px; border-radius:var(--radius-pill); font-size:14px; font-weight:600; opacity:0; transition:all var(--duration-slow) var(--ease-spring); z-index:300; pointer-events:none; white-space:nowrap; box-shadow:var(--shadow-lg); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); }
 .toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 
-.m-today-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:var(--space-3); padding:0 4px; }
+.m-today-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:var(--space-2); padding:0 var(--space-4); }
 .m-today-header-left { display:flex; flex-direction:column; gap:1px; }
 .m-today-header-weekday { font-size:12px; color:var(--text-secondary); font-weight:700; text-transform:uppercase; letter-spacing:0.8px; }
 .m-today-header-date-row { display:flex; align-items:center; gap:var(--space-2); }
-.m-today-header-date { font-size:24px; font-weight:800; letter-spacing:-0.5px; color:var(--text-primary); }
+.m-today-header-date { font-size:22px; font-weight:800; letter-spacing:-0.5px; color:var(--text-primary); }
 .m-today-badge { font-size:11px; font-weight:700; color:var(--accent); background:var(--accent-soft); padding:3px 10px; border-radius:var(--radius-pill); border:1px solid var(--accent-soft); }
 .m-today-header-count { font-size:12px; color:var(--text-secondary); font-weight:600; background:var(--bg-secondary); padding:4px 12px; border-radius:var(--radius-pill); border:1px solid var(--separator-subtle); transition:all var(--duration-fast); }
 .m-today-header-count.pulse { animation:countPulse 0.6s var(--ease-spring); }
@@ -727,6 +730,92 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 .data-diag-val.good { color:var(--success); }
 .data-diag-val.warn { color:var(--warning); }
 .data-diag-val.bad { color:var(--danger); }
+
+/* ═══════════════════════════════════════════════════════════════
+   iOS / iPhone 专属优化
+   ═══════════════════════════════════════════════════════════════ */
+html { -webkit-text-size-adjust: none; -webkit-font-smoothing: antialiased; height: -webkit-fill-available; }
+body { height: 100vh; height: -webkit-fill-available; }
+
+/* iOS 原生感滚动 */
+.m-main, .main-scroll, .editor-body, .m-editor-body { -webkit-overflow-scrolling: touch; }
+
+/* iOS 输入框防止自动缩放 */
+input, textarea { font-size: 16px; -webkit-appearance: none; border-radius: 0; }
+input:focus, textarea:focus { outline: none; }
+
+/* iOS 按钮默认样式清除 */
+button { -webkit-appearance: none; -webkit-tap-highlight-color: transparent; }
+
+/* iOS 安全区域适配 — 顶部刘海/灵动岛 */
+.m-header { padding-top: calc(var(--space-3) + env(safe-area-inset-top, 0px)); }
+
+/* iOS 安全区域适配 — 底部 Home 指示条 + Safari 工具栏 */
+.m-bottom-nav { 
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px)); 
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+}
+.m-fab { 
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px)); 
+}
+
+/* iOS 触控区域最小 48px（比 Apple HIG 44px 更宽松） */
+.m-nav-item, .m-editor-mood, .m-editor-tag, .m-history-nav-btn, 
+.m-record-card-btn, .m-editor-input, .m-editor-textarea,
+.m-quick-input-bar, .m-quick-input-btn, .empty-action {
+  min-height: 48px;
+}
+
+/* iOS 页面内容区域安全区域适配 */
+.m-page { padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); }
+
+/* iOS 空状态真正全屏居中 */
+#m-today .empty-state {
+  min-height: calc(100vh - 200px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-4);
+}
+
+/* iOS 底部导航栏毛玻璃效果增强 */
+.m-bottom-nav {
+  background: rgba(255, 255, 255, 0.85);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+@media (prefers-color-scheme: dark) {
+  .m-bottom-nav {
+    background: rgba(30, 30, 30, 0.85);
+  }
+}
+
+/* iOS 状态栏适配 — 深色模式 */
+@media (prefers-color-scheme: dark) {
+  meta[name="apple-mobile-web-app-status-bar-style"] {
+    content: "black-translucent";
+  }
+}
+
+/* iOS 编辑器底部安全区域 */
+.m-editor-sheet {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.m-editor-footer {
+  padding-bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
+}
+
+/* iOS 键盘弹出时输入框不被遮挡 */
+.m-editor-sheet.on {
+  max-height: calc(100vh - env(safe-area-inset-top, 0px));
+}
+
+/* iOS 确认对话框安全区域 */
+.confirm-dialog {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
 </style>
 </head>
 <body>
@@ -920,9 +1009,9 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
 </div>
 
 <div class="mobile-app" id="mobileApp">
-  <header class="m-header"><div><div class="m-header-title">ReadFlow</div><div class="m-header-date" id="mDate"></div></div><div class="m-streak" id="mStreak">0 天</div></header>
+  <header class="m-header"><div class="m-header-title">ReadFlow</div><div class="m-streak" id="mStreak">0 天</div></header>
   <main class="m-main" id="mMain">
-    <div class="m-page on" id="m-today">
+    <div class="m-page on" id="m-today" style="padding:0 var(--space-4);">
       <div class="m-today-header">
         <div class="m-today-header-left">
           <div class="m-today-header-weekday" id="mTodayWeekday"></div>
@@ -948,7 +1037,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
       </div>
     </div>
 
-    <div class="m-page" id="m-history">
+    <div class="m-page" id="m-history" style="padding:0 var(--space-4);">
       <div class="m-on-this-day" id="mOnThisDay">
         <div class="m-on-this-day-title">&#127775; 那年今日</div>
         <div class="m-on-this-day-sub" id="mOnThisDaySub">看看过去的今天，你记录了什么</div>
@@ -965,7 +1054,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
       <div id="mHistoryDayView"></div>
     </div>
 
-    <div class="m-page" id="m-stats">
+    <div class="m-page" id="m-stats" style="padding:0 var(--space-4);">
       <div style="padding:0 4px;margin-bottom:var(--space-4);"><span style="font-size:20px;font-weight:800;letter-spacing:-0.3px;">数据洞察</span></div>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-3);margin-bottom:var(--space-4);">
         <div class="m-stat-card"><div class="m-stat-label">本月记录</div><div class="m-stat-value" style="color:var(--accent);" id="mStatTotal">0</div></div>
@@ -975,8 +1064,8 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
       <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:var(--space-5);border:1px solid var(--separator-subtle);margin-bottom:var(--space-4);"><div style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:var(--space-3);">情绪分布</div><div id="mMoodChart"></div></div>
       <div style="background:var(--bg-secondary);border-radius:var(--radius-lg);padding:var(--space-5);border:1px solid var(--separator-subtle);"><div style="font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:var(--space-3);">近7天产出</div><div id="mTrendChart"></div></div>
     </div>
-    <div class="m-page" id="m-search"><div class="search-wrap"><span class="search-icon">&#128269;</span><input type="text" class="search-input" id="mSearchInput" placeholder="搜索书名、感悟、标签..." aria-label="搜索"></div><div id="mSearchResults"></div></div>
-    <div class="m-page" id="m-settings">
+    <div class="m-page" id="m-search" style="padding:0 var(--space-4);"><div class="search-wrap"><span class="search-icon">&#128269;</span><input type="text" class="search-input" id="mSearchInput" placeholder="搜索书名、感悟、标签..." aria-label="搜索"></div><div id="mSearchResults"></div></div>
+    <div class="m-page" id="m-settings" style="padding:0 var(--space-4);">
       <div class="setting-group"><button class="setting-item" id="mBtnExport" type="button"><div><div class="setting-label">导出数据</div><div class="setting-desc">将所有记录导出为 JSON</div></div><span class="setting-arrow">&#10132;</span></button><button class="setting-item" id="mBtnImport" type="button"><div><div class="setting-label">导入数据</div><div class="setting-desc">从 JSON 文件恢复</div></div><span class="setting-arrow">&#10132;</span></button></div>
       <div class="data-diag">
         <div class="data-diag-title">&#128202; 数据健康诊断</div>
@@ -2495,7 +2584,7 @@ html,body { height:100%; background:var(--bg-primary); color:var(--text-primary)
     var weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
     var weekday = weekdays[now.getDay()];
     var dateStr = now.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' });
-    var mDate = getEl('mDate'); if (mDate) mDate.textContent = dateStr;
+    
     var deskWeekday = getEl('deskTodayWeekday'); if (deskWeekday) deskWeekday.textContent = weekday;
     var deskDate = getEl('deskTodayDate'); if (deskDate) deskDate.textContent = dateStr;
     var mWeekday = getEl('mTodayWeekday'); if (mWeekday) mWeekday.textContent = weekday;
